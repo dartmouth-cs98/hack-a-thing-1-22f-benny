@@ -12,6 +12,7 @@ const Game1 = ({
   const [doneTarget, setDone] = useState(1);
   const [operationCount, setOCount] = useState(0);
   const [hintNum, setHints] = useState(0);
+  const [bestTime, setBestTime] = useState(9999999);
   
   let [operations] = useState([]);
   let [countHistory] = useState([targets[0]])
@@ -31,7 +32,7 @@ const Game1 = ({
   // Initialize Realtime Database and get a reference to the service
   const database = getDatabase(app);
   const dbRef = ref(database);
-  
+
   const readDatabase = () => {
     get(child(dbRef, keyRef)).then((snapshot) => {
       if (snapshot.exists()) {
@@ -39,6 +40,10 @@ const Game1 = ({
         setComplete(true)
         setTime(snapshot.val().time)
         setHints(snapshot.val().hints)
+        get(child(dbRef, 'users/best')).then((time) => {
+          console.log(time.val())
+          setBestTime(time.val())
+        })
       } else {
         console.log("No data available");
       }
@@ -64,12 +69,24 @@ const Game1 = ({
     return () => clearInterval(interval);
   }, [running, complete, keyRef]);
   
+  // write to database
   const writeToDataBase = (currTime, hints, solution) => {
     set(ref(database, keyRef), {
       time: currTime,
       hints: hints,
       solution: solution
     });
+
+    // check best time and update it if current time is shorter
+    get(child(dbRef, 'users/best')).then((snapshot) => {
+      if (snapshot.exists()) {
+        if (currTime < snapshot.val())
+          set(ref(database, 'users/best'), currTime);
+          setBestTime(currTime)
+      } else {
+        console.log("No data available");
+      }
+    })
   }
   
 
@@ -234,7 +251,7 @@ const Game1 = ({
             </h2>
           ))}
         </div>
-        { complete ? <WinScreen time={time} hints={hintNum}/> : null}
+        { complete ? <WinScreen time={time} hints={hintNum} best={bestTime}/> : null}
         <div className="operations">
           {nums.map((num) => (
             <button className="operation" type="button" onClick={() => pressOperation(num)}>{num}</button>
