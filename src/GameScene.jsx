@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './GameScene.css';
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, set } from "firebase/database";
+import { getDatabase, ref, set, child, get } from "firebase/database";
 import WinScreen from './WinScreen';
 
 
@@ -21,24 +21,7 @@ const Game1 = ({
   const [running, setRunning] = useState(false);
   const [complete, setComplete] = useState(false);
 
-
-  // Code sourced from https://w3collective.com/react-stopwatch/
-  useEffect(() => {
-
-
-    let interval;
-    if(keyRef && !complete) setRunning(true)
-    if (running) {
-      interval = setInterval(() => {
-        setTime((prevTime) => prevTime + 10);
-      }, 10);
-    } else if (!running) {
-      clearInterval(interval);
-    }
-    return () => clearInterval(interval);
-  }, [running]);
-
-
+  // Database code sourced from https://firebase.google.com/docs/database/web/read-and-write?hl=en&authuser=3#web-version-9_2
   const firebaseConfig = {
     databaseURL: "https://operators-a44ee-default-rtdb.firebaseio.com",
   };
@@ -47,7 +30,38 @@ const Game1 = ({
   const app = initializeApp(firebaseConfig);
   // Initialize Realtime Database and get a reference to the service
   const database = getDatabase(app);
+  const dbRef = ref(database);
+  const readDatabase = () => {
+    get(child(dbRef, keyRef)).then((snapshot) => {
+      if (snapshot.exists()) {
+        console.log(snapshot.val())
+        setComplete(true)
+        setTime(snapshot.val().time)
+        setHints(snapshot.val().hints)
+      } else {
+        console.log("No data available");
+      }
+    }).catch((error) => {
+      console.log('huh')
+      // console.error(error);
+    });
+  }
+  // Timer code sourced from https://w3collective.com/react-stopwatch/
+  useEffect(() => {
+    readDatabase()
 
+    let interval;
+    if(keyRef && !complete) setRunning(true)
+    else setRunning(false)
+    if (running) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime + 10);
+      }, 10);
+    } else if (!running) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [running, complete, keyRef]);
   
   const writeToDataBase = (currTime, hints, solution) => {
     set(ref(database, keyRef), {
