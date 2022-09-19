@@ -23,6 +23,7 @@ const Game1 = ({
   // Code sourced from https://w3collective.com/react-stopwatch/
   useEffect(() => {
     let interval;
+    if(keyRef) setRunning(true)
     if (running) {
       interval = setInterval(() => {
         setTime((prevTime) => prevTime + 10);
@@ -44,13 +45,19 @@ const Game1 = ({
   const database = getDatabase(app);
 
   
-  // const writeToDataBase(time, solution) {
-  //   set(ref(database, keyRef), {
-  //     time: ,
-  //     solution: operations
-  //   });
-  // }
+  const writeToDataBase = (currTime, hints, solution) => {
+    set(ref(database, keyRef), {
+      time: currTime,
+      hints: hints,
+      solution: solution
+    });
+  }
   
+
+  const levelCompelted = () => {
+    writeToDataBase(time, hintNum,operations)
+    setRunning(false)
+  }
 
 
 
@@ -65,6 +72,9 @@ const Game1 = ({
           if (doneTarget === idx && target === newCount) {
             setDone(doneTarget + 1);
             targetHistory.push(1);
+            if (doneTarget === 3) {
+              
+            }
           }
         });
   
@@ -81,7 +91,7 @@ const Game1 = ({
 
   const performOperation = (operation) => {
     const value = count;
-    console.log(value)
+    // console.log(value)
     if (operation.includes("sqrt") && value > 0 && Math.sqrt(value) % 1 === 0) {
       return Math.sqrt(value)
     }
@@ -171,7 +181,7 @@ const Game1 = ({
 
     <div className="gameScene">
       <div className='history'>
-        <h1>{time}</h1>
+        <h1>Time: {time.toString().slice(0, -3)}</h1>
         <h2>History</h2>
         <div className='countHistory'>
           {countHistory.map((elm, idx) => (
@@ -207,7 +217,7 @@ const Game1 = ({
           ))}
         </div>
 
-        { doneTarget >= targets.length ? <h2>GOOD JOB!</h2> : null}
+        {/* {  ? <h2>GOOD JOB!</h2> : null} */}
         <div className="operations">
           {nums.map((num) => (
             <button className="operation" type="button" onClick={() => pressOperation(num)}>{num}</button>
