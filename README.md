@@ -3,9 +3,10 @@
 ## What you built?
 
 I built a web app of a game I created awhile ago. It's a number game where you have to get three numbers using three operations. That part of the code was pre written. So for my actually project, I wanted to do something similar to wordle, where it would use a cookie to store how many seconds and how many hints used on a device. I had to create a timer system to keep track of a user's time as they're solving the puzzle. Additionally, I added a database that saved this data in real time, using the cookie number as a unique user. The database is written into after completing the level and it keeps track of the best time. This time is then displayed at the end of every user session. I finally hosted all of this on netlify so that anyone can use it.
+<img width="1020" alt="Screen Shot 2022-09-19 at 3 05 49 PM" src="https://user-images.githubusercontent.com/26367708/191095943-fda37304-007a-459d-be34-9fb1c29d1679.png">
+<img width="971" alt="Screen Shot 2022-09-19 at 3 06 04 PM" src="https://user-images.githubusercontent.com/26367708/191095969-17ac982e-74ea-4321-b285-05440e4db281.png">
+<img width="448" alt="Screen Shot 2022-09-19 at 3 07 24 PM" src="https://user-images.githubusercontent.com/26367708/191096118-e5d409a5-e61a-4b97-aa90-26e2a1ae0555.png">
 
-Include some screenshots.
-[How?](https://help.github.com/articles/about-readmes/#relative-links-and-image-paths-in-readme-files)
 
 ## Who Did What?
 
