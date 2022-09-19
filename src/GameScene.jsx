@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './GameScene.css';
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, set } from "firebase/database";
-
+import WinScreen from './WinScreen';
 
 
 const Game1 = ({
@@ -19,11 +19,15 @@ const Game1 = ({
 
   const [time, setTime] = useState(0);
   const [running, setRunning] = useState(false);
+  const [complete, setComplete] = useState(false);
+
 
   // Code sourced from https://w3collective.com/react-stopwatch/
   useEffect(() => {
+
+
     let interval;
-    if(keyRef) setRunning(true)
+    if(keyRef && !complete) setRunning(true)
     if (running) {
       interval = setInterval(() => {
         setTime((prevTime) => prevTime + 10);
@@ -54,12 +58,11 @@ const Game1 = ({
   }
   
 
-  const levelCompelted = () => {
+  const levelCompleted = () => {
     writeToDataBase(time, hintNum,operations)
+    setComplete(true)
     setRunning(false)
   }
-
-
 
   const pressOperation = (num) => {
     if (operationCount <= limit - 1) {
@@ -73,7 +76,7 @@ const Game1 = ({
             setDone(doneTarget + 1);
             targetHistory.push(1);
             if (doneTarget === 3) {
-              
+              levelCompleted()
             }
           }
         });
@@ -216,8 +219,7 @@ const Game1 = ({
             </h2>
           ))}
         </div>
-
-        {/* {  ? <h2>GOOD JOB!</h2> : null} */}
+        { complete ? <WinScreen time={time} hints={hintNum}/> : null}
         <div className="operations">
           {nums.map((num) => (
             <button className="operation" type="button" onClick={() => pressOperation(num)}>{num}</button>
