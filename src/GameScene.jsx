@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './GameScene.css';
-import levels from './levels';
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, set } from "firebase/database";
+
+
 
 const Game1 = ({
-  targets, nums, limit, solution, coins, setCoins
+  keyRef, targets, nums, limit, solution
 }) => {
   const [count, setCount] = useState(targets[0]);
   const [doneTarget, setDone] = useState(1);
@@ -13,6 +16,42 @@ const Game1 = ({
   let [operations] = useState([]);
   let [countHistory] = useState([targets[0]])
   let [targetHistory] = useState([0]);
+
+  const [time, setTime] = useState(0);
+  const [running, setRunning] = useState(false);
+
+  // Code sourced from https://w3collective.com/react-stopwatch/
+  useEffect(() => {
+    let interval;
+    if (running) {
+      interval = setInterval(() => {
+        setTime((prevTime) => prevTime + 10);
+      }, 10);
+    } else if (!running) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [running]);
+
+
+  const firebaseConfig = {
+    databaseURL: "https://operators-a44ee-default-rtdb.firebaseio.com",
+  };
+  
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  // Initialize Realtime Database and get a reference to the service
+  const database = getDatabase(app);
+
+  
+  // const writeToDataBase(time, solution) {
+  //   set(ref(database, keyRef), {
+  //     time: ,
+  //     solution: operations
+  //   });
+  // }
+  
+
 
 
   const pressOperation = (num) => {
@@ -41,7 +80,6 @@ const Game1 = ({
   };
 
   const performOperation = (operation) => {
-    
     const value = count;
     console.log(value)
     if (operation.includes("sqrt") && value > 0 && Math.sqrt(value) % 1 === 0) {
@@ -124,17 +162,16 @@ const Game1 = ({
 
   const getHint = () => {
 
-    if (solution.length > hintNum && coins >= 10)
+    if (solution.length > hintNum)
     {
       setHints(hintNum + 1);
-      setCoins(coins - 10);
-
     }
   }
   return (
 
     <div className="gameScene">
       <div className='history'>
+        <h1>{time}</h1>
         <h2>History</h2>
         <div className='countHistory'>
           {countHistory.map((elm, idx) => (
