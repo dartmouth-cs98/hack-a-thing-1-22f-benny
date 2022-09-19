@@ -67,6 +67,7 @@ const Game1 = ({
       clearInterval(interval);
     }
     return () => clearInterval(interval);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [running, complete, keyRef]);
   
   // write to database

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import GameScene from './GameScene';
 import levels from './levels';
 import './App.css';
