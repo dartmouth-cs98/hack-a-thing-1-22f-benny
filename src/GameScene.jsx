@@ -31,6 +31,7 @@ const Game1 = ({
   // Initialize Realtime Database and get a reference to the service
   const database = getDatabase(app);
   const dbRef = ref(database);
+  
   const readDatabase = () => {
     get(child(dbRef, keyRef)).then((snapshot) => {
       if (snapshot.exists()) {
